@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
 
 const app = express();
 
@@ -13,6 +14,9 @@ const app = express();
 //Load routes
 const ideas = require('./routes/ideas');
 const users = require('./routes/users');
+
+//passport config
+require('./config/passport')(passport);
 
 //Connect to mongoose
 mongoose.connect('mongodb://localhost/vidjot-dev',{
@@ -39,12 +43,16 @@ app.use(bodyParser.json());
 //method override middleware
 app.use(methodOverride('_method'));
 
-//Session middleware
+//Express Session middleware
 app.use(session({
     secret: 'secret',
     resave: true,
     saveUninitialized: true
 }));
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //flash middleware
 app.use(flash());
@@ -54,6 +62,7 @@ app.use(function(req, res, next){
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
     next();
 });
 
@@ -76,6 +85,8 @@ app.get('/about', (req, res)=>{
 //use routes
 app.use('/ideas', ideas);
 app.use('/users', users);
+
+
 
 const port = 5000;
 app.listen(port, ()=>{
