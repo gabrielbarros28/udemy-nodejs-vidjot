@@ -1,2 +1,2 @@
 # udemy-nodejs-vidjot
-This project is being developed during a nodejs course from udemy
+This project was developed during a nodejs course from udemy.
